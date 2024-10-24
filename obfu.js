@@ -21,7 +21,7 @@ function printCode() {
         if (char === '%' && code[i + 1] !== ' ') {
             var endIdx = code.indexOf('%', i + 1);
             if (endIdx !== -1) {
-                // 保留 % 之间的内容，并将其作为一个整体
+                // 保留 % 之间的内容，作为变量处理
                 codeobfu += '%' + code.slice(i + 1, endIdx + 1) + '%'; 
                 i = endIdx; // 跳过已处理的部分
             } else {
