@@ -16,9 +16,9 @@ function printCode() {
     // 替换代码中的字符
     for (var i = 0; i < code.length; i++) {
         var char = code[i];
-        if (lettertab[char]) {
-            codeobfu += lettertab[char];
-        } else if (char === '%' && code[i + 1] !== ' ') { // 处理 % 符号
+        
+        // 处理 % 符号
+        if (char === '%' && code[i + 1] !== ' ') {
             var endIdx = code.indexOf('%', i + 1);
             if (endIdx !== -1) {
                 codeobfu += '%' + code.slice(i + 1, endIdx + 1) + '%'; // 保留 % 之间的内容
@@ -26,11 +26,13 @@ function printCode() {
             } else {
                 codeobfu += char; // 如果没有找到结束的 %，则保留当前字符
             }
+        } else if (lettertab[char]) {
+            codeobfu += lettertab[char];
         } else {
             codeobfu += char; // 其他字符直接保留
         }
     }
 
     // 生成最终混淆后的代码
-    textareaobf.value = '@echo off\n' + setlettre + '\ncls' + '\n' + codeobfu;
+    textareaobf.value = '@echo off\n' + setlettre + '\ncls\n' + codeobfu + '\nexit /b'; // 添加 exit /b
 }
