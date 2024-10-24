@@ -34,5 +34,5 @@ function printCode() {
     }
 
     // 生成最终混淆后的代码
-    textareaobf.value = '@echo off\n' + setlettre + '\ncls\n' + codeobfu + '\nexit /b'; // 添加 exit /b
+    textareaobf.value = '@echo on\n' + setlettre + '\n' + codeobfu + '\necho Finished! Press any key to exit...\npause\nexit /b';
 }
