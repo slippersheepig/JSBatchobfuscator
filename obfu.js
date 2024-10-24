@@ -16,12 +16,12 @@ function printCode() {
     // 替换代码中的字符
     for (var i = 0; i < code.length; i++) {
         var char = code[i];
-        
+
         // 处理 % 符号
         if (char === '%' && code[i + 1] !== ' ') {
             var endIdx = code.indexOf('%', i + 1);
             if (endIdx !== -1) {
-                // 保留 % 之间的内容，作为变量处理
+                // 保留 % 之间的内容
                 codeobfu += '%' + code.slice(i + 1, endIdx + 1) + '%'; 
                 i = endIdx; // 跳过已处理的部分
             } else {
@@ -29,6 +29,9 @@ function printCode() {
             }
         } else if (lettertab[char]) {
             codeobfu += lettertab[char];
+        } else if (char === '"' || (i > 0 && code[i - 1] === ' ' && (char === ' ' || char === ';'))) {
+            // 保留双引号和命令行分隔符
+            codeobfu += char;
         } else {
             codeobfu += char; // 其他字符直接保留
         }
