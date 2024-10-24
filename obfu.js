@@ -21,7 +21,8 @@ function printCode() {
         if (char === '%' && code[i + 1] !== ' ') {
             var endIdx = code.indexOf('%', i + 1);
             if (endIdx !== -1) {
-                codeobfu += '%' + code.slice(i + 1, endIdx + 1) + '%'; // 保留 % 之间的内容
+                // 保留 % 之间的内容，并将其作为一个整体
+                codeobfu += '%' + code.slice(i + 1, endIdx + 1) + '%'; 
                 i = endIdx; // 跳过已处理的部分
             } else {
                 codeobfu += char; // 如果没有找到结束的 %，则保留当前字符
@@ -34,5 +35,5 @@ function printCode() {
     }
 
     // 生成最终混淆后的代码
-    textareaobf.value = '@echo on\n' + setlettre + '\n' + codeobfu + '\necho Finished! Press any key to exit...\npause\nexit /b';
+    textareaobf.value = '@echo off\n' + setlettre + '\n' + codeobfu + '\necho Finished! Press any key to exit...\npause\nexit /b';
 }
