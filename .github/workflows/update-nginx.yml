@@ -3,8 +3,8 @@ name: Check nginx:alpine-slim updates
 on:
   push:
     branches:
-      - main
-
+      - master
+      
 jobs:
   check-update:
     runs-on: ubuntu-latest
