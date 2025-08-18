@@ -1,9 +1,9 @@
 name: Check nginx:alpine-slim updates
 
 on:
-  schedule:
-    - cron: 8 1 * * *
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   check-update:
