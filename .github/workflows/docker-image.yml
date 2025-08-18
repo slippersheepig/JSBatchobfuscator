@@ -1,9 +1,8 @@
 name: ci
 
 on:
-  push:
-    branches:
-      - "master"
+  repository_dispatch:
+    types: [nginx_update]
 
 jobs:
   docker:
