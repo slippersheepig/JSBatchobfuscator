@@ -1,6 +1,7 @@
 name: Build and Publish Docker image
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types: [nginx_update]
 
