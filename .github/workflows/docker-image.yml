@@ -40,3 +40,5 @@ jobs:
             linux/riscv64
           push: true
           tags: sheepgreen/obfs:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
