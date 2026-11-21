@@ -2,9 +2,12 @@ name: Check nginx:alpine-slim updates
 
 on:
   schedule:
-    - cron: 8 1 * * *
+    - cron: '8 1 * * *'
   workflow_dispatch:
-      
+
+permissions:
+  contents: write
+
 jobs:
   check-update:
     runs-on: ubuntu-latest
@@ -15,13 +18,19 @@ jobs:
       - name: Get latest update timestamp
         id: check
         run: |
-          LAST_UPDATED=$(curl -s https://hub.docker.com/v2/repositories/library/nginx/tags/alpine-slim \
-            | jq -r '.last_updated')
-          echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
+          LAST_UPDATED=$(curl -fsSL https://hub.docker.com/v2/repositories/library/nginx/tags/alpine-slim \
+            | jq -r '.last_updated // empty')
+          if [ -z "$LAST_UPDATED" ]; then
+            echo "Failed to fetch nginx:alpine-slim last_updated timestamp." >&2
+            exit 1
+          fi
+          echo "last_updated=$LAST_UPDATED" >> "$GITHUB_OUTPUT"
           echo "Docker Hub last_updated: $LAST_UPDATED"
 
       - name: Compare with stored timestamp
         id: compare
+        env:
+          CURRENT: ${{ steps.check.outputs.last_updated }}
         run: |
           if [ -f .nginx_last_updated ]; then
             PREV=$(cat .nginx_last_updated)
@@ -29,17 +38,17 @@ jobs:
             PREV="(none)"
           fi
           echo "Previous: $PREV"
-          echo "Current : ${{ steps.check.outputs.last_updated }}"
+          echo "Current : $CURRENT"
 
-          if [ "$PREV" = "${{ steps.check.outputs.last_updated }}" ]; then
+          if [ "$PREV" = "$CURRENT" ]; then
             echo "No update detected."
-            echo "updated=false" >> $GITHUB_OUTPUT
+            echo "updated=false" >> "$GITHUB_OUTPUT"
           else
             echo "Update detected!"
-            echo "updated=true" >> $GITHUB_OUTPUT
-            echo "${{ steps.check.outputs.last_updated }}" > .nginx_last_updated
-            git config --global user.name "github-actions"
-            git config --global user.email "actions@github.com"
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "$CURRENT" > .nginx_last_updated
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add .nginx_last_updated
             git commit -m "chore: update nginx:alpine-slim timestamp"
             git push
@@ -48,8 +57,8 @@ jobs:
       - name: Trigger docker workflows
         if: steps.compare.outputs.updated == 'true'
         run: |
-          curl -X POST \
+          curl -fsS -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            "https://api.github.com/repos/${{ github.repository }}/dispatches" \
             -d '{"event_type":"nginx_update"}'
